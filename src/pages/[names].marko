@@ -1,0 +1,95 @@
+import { getGunpla } from "../util/api"
+
+static function getPage(query) {
+  if (!query || !query.includes("page")) return 1;
+  return +query.split("=")[1];
+}
+
+$ const page = getPage(input.query);
+<app-layout>
+  <div class="price-view">
+    <top-header/>
+    <await(getGunpla(input.params.names || "Xi", page)) client-reorder>
+      <@then|Item|>
+        <main>
+          <ul>
+            $ const Items = Item.Items;
+            <for|Item| of=Items>
+              <li class="li_item">
+                <a href=Item.Item.shopUrl class="li_text  item1" traget="_blank">
+                  ${Item.Item.shopName}
+                </a>
+                <a href=Item.Item.shopAffiliateUrl class="li_text  item2" traget="_blank">
+                  ${Item.Item.itemName}
+                </a>
+                <p class="li_text price_text  item3">
+                  ${Number(Item.Item.itemPrice).toLocaleString()}円
+                </p>
+              </li>
+            </for>
+          </ul>
+        </main>
+        <div class="news-list-nav">
+          <if(page > 1)>
+            <a class="page-link" href=`${input.pathname}?page=${page - 1}`>< 前へ</a>
+          </if>
+          <else>
+            <span class="page-link disabled" aria-hidden="true">< prev</span>
+          </else>
+          <span>page ${page}</span>
+          <if(Item.count > Item.page * 30)>
+            <a class="navigation-link" href=`${input.pathname}?page=${page + 1}`>次へ ></a>
+          </if>
+          <else>
+            <span class="page-link" aria-hidden="true">more ></span>
+          </else>
+        </div>
+      </@then>
+      <@placeholder>
+        <loading/>
+      </@placeholder>
+    </await>
+  </div>
+</app-layout>
+style {
+  .price-view {
+    margin: 0 auto;
+    max-width: 800px;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .li_item {
+    display: flex;
+    padding: 5px 0;
+    border-top: 1px solid #2a2a2a
+  }
+  .li_item:hover {
+    background-color: rgb(42, 42, 42);
+  }
+  .li_text {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    text-decoration: none;
+  }
+  .price_text {
+    margin: 0;
+  }
+  .item1 {
+    flex-basis: 20%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item2 {
+    flex-basis: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item1 {
+    flex-basis: 20%;
+  }
+}
